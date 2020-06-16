@@ -1,4 +1,4 @@
-import userInput from './utils/userInput'
+import userInput from './main/userInput'
 function start ():void {
   userInput()
 }
