@@ -8,7 +8,7 @@ export default async function userInput ():Promise<Record<string, unknown>> {
     lang: String()
   }
   input.search = getSearch()
-  input.article = await getArticle(algorithmia.fetchArticles(input.search))
+  input.article = await getArticle(algorithmia.getArticlesArray(input.search))
   input.lang = await getLang()
 
   function getSearch ():string {
