@@ -25,6 +25,7 @@
   "homepage": "https://github.com/vilmacio22/googleslides-maker#readme",
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.1",
+    "@types/readline-sync": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
     "@typescript-eslint/parser": "^3.2.0",
     "eslint": "^7.2.0",
@@ -35,5 +36,9 @@
     "eslint-plugin-standard": "^4.0.1",
     "sucrase": "^3.15.0",
     "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "algorithmia": "^0.3.10",
+    "readline-sync": "^1.4.10"
   }
 }
