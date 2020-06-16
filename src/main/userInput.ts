@@ -1,6 +1,5 @@
 import readline from 'readline-sync'
-import algorithmia from 'algorithmia'
-import credentials from '../../credentials'
+import algorithmia from '../utils/algo/services'
 
 export default async function userInput ():Promise<Record<string, unknown>> {
   const input = {
@@ -9,7 +8,7 @@ export default async function userInput ():Promise<Record<string, unknown>> {
     lang: String()
   }
   input.search = getSearch()
-  input.article = await getArticle(fetchArticles(input.search))
+  input.article = await getArticle(algorithmia.fetchArticles(input.search))
   input.lang = await getLang()
 
   function getSearch ():string {
@@ -27,13 +26,6 @@ export default async function userInput ():Promise<Record<string, unknown>> {
     return readline.question('What is the language of the article? ')
   }
 
-  async function fetchArticles (search:string):Promise<Array<string>> {
-    const wikipedia = algorithmia(credentials.algorithmia).algo('web/WikipediaParser/0.1.2')
-    const wikipediaResponse = await wikipedia.pipe({ search: search })
-    const wkipediaArticles = wikipediaResponse.get()
-    console.log(wkipediaArticles)
-    return wkipediaArticles
-  }
   console.log(input)
-  return {}
+  return input
 }
