@@ -1,7 +1,7 @@
 import algorithmia from 'algorithmia'
 import credentials from '../../../credentials'
 
-async function fetchWikipedia (input:Record<string, unknown>):Promise<Array<string>> {
+async function fetchWikipedia (input:Record<string, unknown>):Promise<Array<string>> { // Or Promise<Record<string, any>>
   const wikipedia = algorithmia(credentials.algorithmia).algo('web/WikipediaParser/0.1.2')
   const wikipediaResponse = await wikipedia.pipe(input)
   return wikipediaResponse.get()
