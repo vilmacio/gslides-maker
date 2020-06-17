@@ -5,11 +5,7 @@ export interface Data {
         lang?: string
     },
     cleanContent?: string,
-    sentences?:[{
-        text?:string,
-        keywords?:Array<string>,
-        images?:Array<string>
-    }]
+    sentences?:{text?:string, keywords?:string[], images?:string[]}[]
 }
 
 const data:Data = {
