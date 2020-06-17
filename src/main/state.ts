@@ -6,7 +6,7 @@ export interface Data {
     },
     content?:{
         fullContent?: string,
-        cleanedContent?: string,
+        cleanContent?: string,
         images?: Array<string>
     }
 }
