@@ -4,16 +4,17 @@ export interface Data {
         articleName?: string,
         lang?: string
     },
-    content?:{
-        fullContent?: string,
-        cleanContent?: string,
-        images?: Array<string>
-    }
+    cleanContent?: string,
+    sentences?:[{
+        text?:string,
+        keywords?:Array<string>,
+        images?:Array<string>
+    }]
 }
 
 const data:Data = {
   input: {},
-  content: {}
+  sentences: [{}]
 }
 
 export default data
