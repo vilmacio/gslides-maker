@@ -1,7 +1,7 @@
 export interface Data {
     input?:{
         search?: string,
-        article?: string,
+        articleName?: string,
         lang?: string
     },
     content?:{
@@ -11,6 +11,9 @@ export interface Data {
     }
 }
 
-const data:Data = {}
+const data:Data = {
+  input: {},
+  content: {}
+}
 
 export default data
