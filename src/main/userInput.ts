@@ -1,15 +1,11 @@
 import readline from 'readline-sync'
-import algorithmia from '../utils/algo/services'
+import getArticlesArray from '../utils/algo/services'
+import { Data } from './state'
 
-export default async function userInput ():Promise<Record<string, unknown>> {
-  const input = {
-    search: String(),
-    article: String(),
-    lang: String()
-  }
-  input.search = getSearch()
-  input.article = await getArticle(algorithmia.getArticlesArray(input.search))
-  input.lang = await getLang()
+export default async function userInput (data:Data):Promise<Data> {
+  data.input.search = getSearch()
+  data.input.articleName = await getArticle(getArticlesArray(data.input.search))
+  data.input.lang = await getLang()
 
   function getSearch ():string {
     return readline.question('What do you want to research about? ')
@@ -26,6 +22,5 @@ export default async function userInput ():Promise<Record<string, unknown>> {
     return readline.question('What is the language of the article? ')
   }
 
-  console.log(input)
-  return input
+  return data
 }
