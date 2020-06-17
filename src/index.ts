@@ -1,5 +1,7 @@
+import data from './main/state'
 import userInput from './main/userInput'
+
 function start ():void {
-  userInput()
+  userInput(data)
 }
 start()
