@@ -5,11 +5,12 @@ import sbd from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understanding/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
 
-export default async function text (data:Data):Promise<Data> {
+export default async function text (data:Data):Promise<void> {
+  console.log('> [text-robot]')
   const fullContent = await fetchContent(data.input.articleName, data.input.lang)
   data.cleanContent = cleanContent(fullContent)
   breakContent(data.cleanContent)
-  limitSentences(data, 10)
+  limitSentences(data, 2)
   await setKeywords(data)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {
@@ -96,7 +97,4 @@ export default async function text (data:Data):Promise<Data> {
       sentence.keywords = await fetchWatson(sentence.text)
     }
   }
-
-  console.log(data.sentences)
-  return data
 }
