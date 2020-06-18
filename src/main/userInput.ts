@@ -1,6 +1,6 @@
 import readline from 'readline-sync'
 import getArticlesArray from '../utils/algo/services'
-import { Data } from './state'
+import { Data } from './data'
 
 export default async function userInput (data:Data):Promise<Data> {
   data.input.search = getSearch()

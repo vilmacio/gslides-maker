@@ -1,4 +1,4 @@
-import { Data } from './state'
+import { Data } from './data'
 import credentials from '../../credentials'
 import algorithmia from 'algorithmia'
 import sbd from 'sbd'
