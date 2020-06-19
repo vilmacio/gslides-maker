@@ -6,6 +6,7 @@ export interface Data {
     },
     cleanContent?: string,
     sentences?:{text?:string, keywords?:string[], images?:string[]}[]
+    downloadedImages?:string[]
 }
 
 const data:Data = {
