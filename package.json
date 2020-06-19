@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "googleapis": "^52.1.0",
     "ibm-watson": "^5.6.0",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.18"
