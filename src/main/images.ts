@@ -1,11 +1,15 @@
 import { Data } from './data'
 import { google } from 'googleapis'
 import credentials from '../../credentials'
+import imageDownloader from 'image-downloader'
+import fileSystem from 'fs'
 const googleSearch = google.customsearch('v1')
 
 export default async function images (data:Data):Promise<void> {
   console.log('> [robot-images]')
   await joinKeywords(data)
+  await downloadImages(data)
+
   async function joinKeywords (data:Data):Promise<void> {
     for (const sentence of data.sentences) {
       if (sentence.keywords.length === 0) {
@@ -34,5 +38,40 @@ export default async function images (data:Data):Promise<void> {
     })
 
     return imgLinks
+  }
+
+  async function downloadImages (data:Data):Promise<void> {
+    data.downloadedImages = []
+
+    for (let sentenceIndex = 0; sentenceIndex < data.sentences.length; sentenceIndex++) {
+      const images = data.sentences[sentenceIndex].images
+
+      for (let imageIndex = 0; imageIndex < images.length; imageIndex++) {
+        const imageUrl = images[imageIndex]
+
+        try {
+          if (data.downloadedImages.includes(imageUrl)) {
+            throw new Error('Image already downloaded')
+          }
+
+          await downloadAndSave(imageUrl, `${sentenceIndex}-original.png`)
+          data.downloadedImages.push(imageUrl)
+          console.log(`> [image-robot] [${sentenceIndex}][${imageIndex}] Image successfully downloaded: ${imageUrl}`)
+          break
+        } catch (error) {
+          console.log(`> [image-robot] [${sentenceIndex}][${imageIndex}] Error (${imageUrl}): ${error}`)
+        }
+      }
+    }
+  }
+
+  async function downloadAndSave (url:string, fileName:string) {
+    if (!fileSystem.existsSync('./cache')) {
+      fileSystem.mkdirSync('./cache')
+    }
+    return imageDownloader.image({
+      url: url,
+      dest: `./cache/${fileName}`
+    })
   }
 }

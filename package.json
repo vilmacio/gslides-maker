@@ -40,8 +40,10 @@
   },
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "fs": "^0.0.1-security",
     "googleapis": "^52.1.0",
     "ibm-watson": "^5.6.0",
+    "image-downloader": "^4.0.1",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.18"
   }
