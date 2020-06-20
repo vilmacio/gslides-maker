@@ -1,13 +1,16 @@
-// import { Data } from '../main/data'
 import express, { Request, Response, Express } from 'express'
 import credentials from '../../credentials'
-import { google } from 'googleapis'
+import opn from 'opn'
+import { google, GoogleApis } from 'googleapis'
 const OAuth2 = google.auth.OAuth2
-export default async function authentication ():Promise<void> {
+
+export default async function authentication ():Promise<GoogleApis> {
   const webServer = await startWebServer()
   const OAuthClient = await createOAuthClient()
   requestUserConsent(OAuthClient)
-  await waitForGoogleCallback(webServer)
+  const authorizationToken = await waitForGoogleCallback(webServer)
+  await requestGoogleForAccessTokens(OAuthClient, authorizationToken)
+  setGlobalGoogleAuthentication(OAuthClient)
 
   async function startWebServer ():Promise<Express> {
     return new Promise((resolve) => {
@@ -34,10 +37,10 @@ export default async function authentication ():Promise<void> {
   function requestUserConsent (OAuthClient) {
     const consentUrl = OAuthClient.generateAuthUrl({
       access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/drive.file']
+      scope: ['https://www.googleapis.com/auth/presentations']
     })
-
-    console.log(`> [youtube-robot] Please give your consent: ${consentUrl}`)
+    opn(consentUrl)
+    console.log('> [youtube-robot] Please give your consent')
   }
 
   async function waitForGoogleCallback (webServer:Express) {
@@ -53,4 +56,27 @@ export default async function authentication ():Promise<void> {
       })
     })
   }
+
+  async function requestGoogleForAccessTokens (OAuthClient, authorizationToken) {
+    return new Promise((resolve, reject) => {
+      OAuthClient.getToken(authorizationToken, (error, tokens) => {
+        if (error) {
+          return reject(error)
+        }
+
+        console.log('> [youtube-robot] Access tokens received!')
+
+        OAuthClient.setCredentials(tokens)
+        resolve()
+      })
+    })
+  }
+
+  function setGlobalGoogleAuthentication (OAuthClient) {
+    google.options({
+      auth: OAuthClient
+    })
+  }
+
+  return google
 }
