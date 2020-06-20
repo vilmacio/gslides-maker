@@ -25,6 +25,8 @@
   "homepage": "https://github.com/vilmacio22/googleslides-maker#readme",
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.1",
+    "@types/express": "^4.17.6",
+    "@types/opn": "^5.5.0",
     "@types/readline-sync": "^1.4.3",
     "@types/sbd": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^3.2.0",
@@ -40,10 +42,12 @@
   },
   "dependencies": {
     "algorithmia": "^0.3.10",
+    "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "googleapis": "^52.1.0",
     "ibm-watson": "^5.6.0",
     "image-downloader": "^4.0.1",
+    "opn": "^6.0.0",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.18"
   }
