@@ -37,7 +37,9 @@ export default async function authentication ():Promise<GoogleApis> {
   function requestUserConsent (OAuthClient) {
     const consentUrl = OAuthClient.generateAuthUrl({
       access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/presentations']
+      scope: ['https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/presentations'
+      ]
     })
     opn(consentUrl)
     console.log('> [youtube-robot] Please give your consent')
