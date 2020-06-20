@@ -66,12 +66,12 @@ export default async function images (data:Data):Promise<void> {
   }
 
   async function downloadAndSave (url:string, fileName:string) {
-    if (!fileSystem.existsSync('./cache')) {
-      fileSystem.mkdirSync('./cache')
+    if (!fileSystem.existsSync('./.cache')) {
+      fileSystem.mkdirSync('./.cache')
     }
     return imageDownloader.image({
       url: url,
-      dest: `./cache/${fileName}`
+      dest: `./.cache/${fileName}`
     })
   }
 }
