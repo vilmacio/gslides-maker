@@ -4,24 +4,23 @@ import opn from 'opn'
 
 export default async function slides (data:Data):Promise<void> {
   const google = await auth()
-  await createSlide()
+  const slides = google.slides({ version: 'v1' })
 
-  async function createSlide ():Promise<void> {
-    // const slide = google.slides({ version: 'v1' })
-    const drive = google.drive({ version: 'v3' })
-    const y = drive.files.create({
+  const presentationId = (await createSlide()).presentationId
+  openBrowser(presentationId)
+
+  async function createSlide () {
+    const response = slides.presentations.create({
       requestBody: {
-        mimeType: 'application/vnd.google-apps.presentation',
-        name: data.input.articleName
+        title: data.input.articleName
       }
     })
-    const response = await y
+    const presentationData = (await response).data
+    return presentationData
+  }
+
+  function openBrowser (presentationId:string) {
     console.log('> [google-robot] Opening presentation...')
-    opn(`https://docs.google.com/presentation/d/${response.data.id}/`)
-    /*
-    const x = slide.presentations.batchUpdate({
-      requestBody: {}
-    })
-    */
+    opn(`https://docs.google.com/presentation/d/${presentationId}/`)
   }
 }
