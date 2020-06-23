@@ -5,7 +5,7 @@ export interface Data {
         lang?: string
     },
     cleanContent?: string,
-    sentences?:{text?:string, keywords?:string[], images?:string[]}[]
+    sentences?:{id?: number, text?:string, keywords?:string[], images?:string[]}[]
     downloadedImages?:string[]
 }
 
