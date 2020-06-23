@@ -21,16 +21,15 @@ export default async function slides (data:Data):Promise<void> {
     return presentationData
   }
 
-  async function createContentPages (presentationId:string):Promise<void> {
-    let cont = 1
-    data.sentences.forEach(() => {
+  async function createContentPages (presentationId:string) {
+    for (const sentence of data.sentences) {
       slides.presentations.batchUpdate({
         presentationId: presentationId,
         requestBody: {
           requests: [
             {
               createSlide: {
-                objectId: `content${cont}`,
+                objectId: `content${sentence.id}`,
                 slideLayoutReference: {
                   predefinedLayout: 'TITLE_AND_TWO_COLUMNS'
                 }
@@ -39,9 +38,10 @@ export default async function slides (data:Data):Promise<void> {
           ]
         }
       })
-      cont += 1
-    })
+    }
+    return slides.presentations.get({ presentationId: presentationId })
   }
+
   async function createEnd (presentationId:string):Promise<void> {
     slides.presentations.batchUpdate({
       presentationId: presentationId,

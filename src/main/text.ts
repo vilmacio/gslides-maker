@@ -53,11 +53,14 @@ export default async function text (data:Data):Promise<void> {
 
   function breakContent (text:string):void {
     const sentences = sbd.sentences(text)
+    let id = 1
     data.sentences.shift()
     sentences.forEach((item) => {
       data.sentences.push({
+        id: id,
         text: item
       })
+      id++
     })
   }
 
