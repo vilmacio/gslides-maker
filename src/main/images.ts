@@ -33,11 +33,13 @@ export default async function images (data:Data):Promise<void> {
       num: 2
     })
     console.dir(response, { delph: null })
-    const imgLinks = response.data.items.map((item) => {
-      return item.link
-    })
-
-    return imgLinks
+    if (response.data.items !== undefined) {
+      const imgLinks = response.data.items.map((item) => {
+        return item.link
+      })
+      return imgLinks
+    }
+    return []
   }
 
   async function downloadImages (data:Data):Promise<void> {
