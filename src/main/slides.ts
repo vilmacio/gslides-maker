@@ -6,58 +6,62 @@ export default async function slides (data:Data):Promise<void> {
   const google = await auth()
   const slides = google.slides({ version: 'v1' })
 
-  const presentationId = (await createSlide()).presentationId
-  await createContentPages(presentationId)
-  await createEnd(presentationId)
+  const presentationId = await createPresentation()
+  await createStructure(presentationId)
   openBrowser(presentationId)
 
-  async function createSlide () {
+  async function createPresentation () {
     const response = slides.presentations.create({
       requestBody: {
         title: data.input.articleName
       }
     })
-    const presentationData = (await response).data
-    return presentationData
+    const presentationId = (await response).data.presentationId
+    return presentationId
   }
 
-  async function createContentPages (presentationId:string) {
-    for (const sentence of data.sentences) {
+  async function createStructure (presentationId:string) {
+    const structureReq = []
+    await contentPage()
+    await finalPage()
+    await update()
+
+    async function contentPage () {
+      for (const sentence of data.sentences) {
+        let layout = 'TITLE_AND_TWO_COLUMNS'
+        if (sentence.images === []) {
+          layout = 'SECTION_HEADER'
+        }
+        structureReq.push(
+          {
+            createSlide: {
+              objectId: `content${sentence.id}`,
+              slideLayoutReference: { predefinedLayout: layout }
+            }
+          })
+      }
+    }
+
+    async function finalPage () {
+      structureReq.push(
+        {
+          createSlide: {
+            objectId: 'finalPage',
+            slideLayoutReference: { predefinedLayout: 'BIG_NUMBER' }
+          }
+        })
+    }
+
+    async function update () {
       slides.presentations.batchUpdate({
         presentationId: presentationId,
         requestBody: {
-          requests: [
-            {
-              createSlide: {
-                objectId: `content${sentence.id}`,
-                slideLayoutReference: {
-                  predefinedLayout: 'TITLE_AND_TWO_COLUMNS'
-                }
-              }
-            }
-          ]
+          requests: structureReq
         }
       })
     }
-    return slides.presentations.get({ presentationId: presentationId })
-  }
 
-  async function createEnd (presentationId:string):Promise<void> {
-    slides.presentations.batchUpdate({
-      presentationId: presentationId,
-      requestBody: {
-        requests: [
-          {
-            createSlide: {
-              objectId: 'finalPage',
-              slideLayoutReference: {
-                predefinedLayout: 'BIG_NUMBER'
-              }
-            }
-          }
-        ]
-      }
-    })
+    return slides.presentations.get({ presentationId: presentationId })
   }
 
   function openBrowser (presentationId:string) {
