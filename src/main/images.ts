@@ -9,6 +9,7 @@ export default async function images (data:Data):Promise<void> {
   console.log('> [robot-images]')
   await joinKeywords(data)
   await downloadImages(data)
+  console.log(data.sentences)
 
   async function joinKeywords (data:Data):Promise<void> {
     for (const sentence of data.sentences) {
@@ -32,7 +33,6 @@ export default async function images (data:Data):Promise<void> {
       searchType: 'image',
       num: 2
     })
-    console.dir(response, { delph: null })
     if (response.data.items !== undefined) {
       const imgLinks = response.data.items.map((item) => {
         return item.link

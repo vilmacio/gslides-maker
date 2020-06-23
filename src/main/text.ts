@@ -10,7 +10,7 @@ export default async function text (data:Data):Promise<void> {
   const fullContent = await fetchContent(data.input.articleName, data.input.lang)
   data.cleanContent = cleanContent(fullContent)
   breakContent(data.cleanContent)
-  limitSentences(data, 3)
+  limitSentences(data, 5)
   await setKeywords(data)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {

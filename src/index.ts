@@ -8,6 +8,7 @@ async function start ():Promise<void> {
   await userInput(data)
   await text(data)
   await images(data)
+  console.log(JSON.stringify(data))
   await slides(data)
 }
 start()
