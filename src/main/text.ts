@@ -9,8 +9,10 @@ export default async function text (data:Data):Promise<void> {
   console.log('> [text-robot]')
   const fullContent = await fetchContent(data.input.articleName, data.input.lang)
   data.cleanContent = cleanContent(fullContent)
-  breakContent(data.cleanContent)
-  limitSentences(data, 5)
+  data.indexContent = indexContent(data.cleanContent)
+  console.log(data.indexContent)
+  breakContent(data.indexContent)
+  limitSentences(false, data, 2)
   await setKeywords(data)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {
@@ -36,7 +38,7 @@ export default async function text (data:Data):Promise<void> {
       const allLines = text.split('\n')
 
       const withoutBlankLinesAndMarkdown = allLines.filter((line) => {
-        if (line.trim().length === 0 || line.trim().startsWith('=')) {
+        if (line.trim().length === 0) {
           return false
         }
 
@@ -49,6 +51,12 @@ export default async function text (data:Data):Promise<void> {
       return text.replace(/\((?:\([^()]*\)|[^()])*\)/gm, '').replace(/ {2}/g, ' ')
     }
     return withoutDatesInParentheses
+  }
+
+  function indexContent (text:string):string {
+    const endPosition = text.search('=')
+    const indexContent = text.substring(0, endPosition)
+    return indexContent
   }
 
   function breakContent (text:string):void {
@@ -64,8 +72,10 @@ export default async function text (data:Data):Promise<void> {
     })
   }
 
-  function limitSentences (data:Data, max:number):void {
-    data.sentences = data.sentences.slice(0, max)
+  function limitSentences (active:boolean, data:Data, max:number):void {
+    if (active) {
+      data.sentences = data.sentences.slice(0, max)
+    }
   }
 
   async function fetchWatson (sentence:string):Promise<Array<string>> {
