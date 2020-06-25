@@ -14,7 +14,7 @@ export default async function slides (data:Data):Promise<void> {
     const presentationData = await slides.presentations.get({ presentationId: presentationId })
     await pushContent(presentationData)
     openBrowser(presentationId)
-  }, 10000)
+  }, 6000)
 
   async function createPresentation () {
     const response = slides.presentations.create({
