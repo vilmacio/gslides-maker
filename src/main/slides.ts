@@ -1,5 +1,5 @@
 import { Data } from './data'
-import auth from '../utils/authentication'
+import auth from '../services/auth'
 import opn from 'opn'
 
 export default async function slides (data:Data):Promise<void> {
