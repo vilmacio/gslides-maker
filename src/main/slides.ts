@@ -1,6 +1,7 @@
 import { Data } from './data'
 import auth from '../services/auth'
 import opn from 'opn'
+import sleep from '../utils/sleep'
 
 export default async function slides (data:Data):Promise<void> {
   const google = await auth()
@@ -8,13 +9,16 @@ export default async function slides (data:Data):Promise<void> {
 
   const idResponse = await createPresentation()
   const presentationId = idResponse
-  await createStructure(presentationId)
-  console.log('> Aguardando o timeout...')
-  setTimeout(async () => {
+  await createPage()
+  await createShape()
+  await pushContent()
+  openBrowser()
+
+  async function presentationDataUpdate () {
+    await sleep(6000)
     const presentationData = await slides.presentations.get({ presentationId: presentationId })
-    await pushContent(presentationData)
-    openBrowser(presentationId)
-  }, 6000)
+    return presentationData
+  }
 
   async function createPresentation () {
     const response = slides.presentations.create({
@@ -26,7 +30,7 @@ export default async function slides (data:Data):Promise<void> {
     return presentationId
   }
 
-  async function createStructure (presentationId:string) {
+  async function createPage () {
     const structureReq = []
     await contentPage()
     await finalPage()
@@ -34,15 +38,11 @@ export default async function slides (data:Data):Promise<void> {
 
     async function contentPage () {
       for (const sentence of data.sentences) {
-        let layout = 'TITLE_AND_TWO_COLUMNS'
-        if (sentence.images === []) {
-          layout = 'SECTION_HEADER'
-        }
         structureReq.push(
           {
             createSlide: {
               objectId: `content${sentence.id}`,
-              slideLayoutReference: { predefinedLayout: layout }
+              slideLayoutReference: { predefinedLayout: 'BLANK' }
             }
           })
       }
@@ -68,7 +68,45 @@ export default async function slides (data:Data):Promise<void> {
     }
   }
 
-  async function pushContent (presentationData) {
+  async function createShape ():Promise<void> {
+    const presentationData = await presentationDataUpdate()
+    for (const sentence of data.sentences) {
+      slides.presentations.batchUpdate({
+        presentationId: presentationId,
+        requestBody: {
+          requests: [
+            {
+              createShape: {
+                shapeType: 'TEXT_BOX',
+                elementProperties: {
+                  pageObjectId: presentationData.data.slides[sentence.id].objectId,
+                  size: {
+                    width: {
+                      magnitude: 3000000,
+                      unit: 'EMU'
+                    },
+                    height: {
+                      magnitude: 3000000,
+                      unit: 'EMU'
+                    }
+                  },
+                  transform: {
+                    scaleX: 1.4031,
+                    scaleY: 1.7145,
+                    translateX: 362600,
+                    unit: 'EMU'
+                  }
+                }
+              }
+            }
+          ]
+        }
+      })
+    }
+  }
+
+  async function pushContent () {
+    const presentationData = await presentationDataUpdate()
     console.log('presentationId do presentationId: ' + presentationId)
     console.log('presentationId da presentationData: ' + presentationData.data.presentationId)
     console.log(presentationData.data.slides)
@@ -79,7 +117,7 @@ export default async function slides (data:Data):Promise<void> {
           requests: [
             {
               insertText: {
-                objectId: presentationData.data.slides[sentence.id].pageElements[1].objectId,
+                objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
                 text: sentence.text
               }
             }
@@ -89,7 +127,7 @@ export default async function slides (data:Data):Promise<void> {
     }
   }
 
-  function openBrowser (presentationId:string) {
+  function openBrowser () {
     console.log('> [google-robot] Opening presentation...')
     opn(`https://docs.google.com/presentation/d/${presentationId}/`)
   }
