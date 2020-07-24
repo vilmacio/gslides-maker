@@ -8,7 +8,8 @@ export default async function userInput (data:Data):Promise<Data> {
   data.input.lang = await getLang()
 
   function getSearch ():string {
-    return readline.question('What do you want to research about? ')
+    const search = readline.question('What do you want to research about? ')
+    return search
   }
 
   async function getArticle (fetchArticles: Promise<Array<string>>):Promise<string> {
@@ -19,7 +20,11 @@ export default async function userInput (data:Data):Promise<Data> {
   }
 
   async function getLang ():Promise<string> {
-    return readline.question('What is the language of the article? ')
+    let answer = readline.question('What is the language of the article [en]? ')
+    if (!answer) {
+      answer = 'en'
+    }
+    return answer
   }
 
   return data
