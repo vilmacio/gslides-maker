@@ -19,7 +19,7 @@ export default async function slides (data:Data):Promise<void> {
   openBrowser()
 
   async function presentationDataUpdate () {
-    await sleep(6000)
+    await sleep(1000)
     const presentationData = await slides.presentations.get({ presentationId: presentationId })
     return presentationData
   }
@@ -84,9 +84,9 @@ export default async function slides (data:Data):Promise<void> {
                 objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
                 applyMode: 'ABSOLUTE',
                 transform: {
-                  scaleX: 1.4031,
+                  scaleX: 2.2024,
                   scaleY: 1.7145,
-                  translateX: 362600,
+                  translateX: 1262375,
                   unit: 'EMU'
                 }
               }
@@ -146,7 +146,7 @@ export default async function slides (data:Data):Promise<void> {
             requests: [
               {
                 insertText: {
-                  objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
+                  objectId: pages[sentence.id].pageElements[0].objectId,
                   text: sentence.text
                 }
               }
