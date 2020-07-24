@@ -1,4 +1,5 @@
 import express, { Request, Response, Express } from 'express'
+import { Server } from 'http'
 import credentials from '../../credentials'
 import opn from 'opn'
 import { google, GoogleApis } from 'googleapis'
@@ -8,18 +9,25 @@ export default async function authentication ():Promise<GoogleApis> {
   const webServer = await startWebServer()
   const OAuthClient = await createOAuthClient()
   requestUserConsent(OAuthClient)
-  const authorizationToken = await waitForGoogleCallback(webServer)
+  const authorizationToken = await waitForGoogleCallback(webServer.app)
   await requestGoogleForAccessTokens(OAuthClient, authorizationToken)
   setGlobalGoogleAuthentication(OAuthClient)
+  closeServer(webServer.server)
 
-  async function startWebServer ():Promise<Express> {
+  interface webServer {
+    app: Express;
+    server: Server;
+  }
+
+  async function startWebServer ():Promise<webServer> {
     return new Promise((resolve) => {
       const app = express()
 
-      app.listen(3333, () => {
-        console.log('> [youtube-robot] Listening on http://localhost:3333')
+      const server = app.listen(3333)
 
-        resolve(app)
+      resolve({
+        app: app,
+        server: server
       })
     })
   }
@@ -42,16 +50,16 @@ export default async function authentication ():Promise<GoogleApis> {
       ]
     })
     opn(consentUrl)
-    console.log('> [youtube-robot] Please give your consent')
+    console.log('> [slides-robot] Please give your consent')
   }
 
   async function waitForGoogleCallback (webServer:Express) {
     return new Promise((resolve) => {
-      console.log('> [youtube-robot] Waiting for user consent...')
+      console.log('> [slides-robot] Waiting for user consent...')
 
       webServer.get('/callback', (req:Request, res:Response) => {
         const authCode = req.query.code
-        console.log(`> [youtube-robot] Consent given: ${authCode}`)
+        console.log(`> [slides-robot] Consent given: ${authCode}`)
 
         res.send('<h1>Thank you!</h1><p>Now close this tab.</p>')
         resolve(authCode)
@@ -66,7 +74,7 @@ export default async function authentication ():Promise<GoogleApis> {
           return reject(error)
         }
 
-        console.log('> [youtube-robot] Access tokens received!')
+        console.log('> [slides-robot] Access tokens received!')
 
         OAuthClient.setCredentials(tokens)
         resolve()
@@ -78,6 +86,10 @@ export default async function authentication ():Promise<GoogleApis> {
     google.options({
       auth: OAuthClient
     })
+  }
+
+  function closeServer (server:Server) {
+    server.close()
   }
 
   return google
