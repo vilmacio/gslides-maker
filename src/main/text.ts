@@ -12,7 +12,7 @@ export default async function text (data:Data):Promise<void> {
   data.indexContent = indexContent(data.cleanContent)
   console.log(data.indexContent)
   breakContent(data.indexContent)
-  limitSentences(true, data, 4)
+  limitSentences(false, data, 3)
   await setKeywords(data)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {

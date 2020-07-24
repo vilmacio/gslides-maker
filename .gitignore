@@ -82,6 +82,7 @@ typings/
 .nuxt
 dist
 src/main/test.ts
+src/main/downgrade.ts
 
 # Gatsby files
 .cache/
