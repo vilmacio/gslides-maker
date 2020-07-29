@@ -3,20 +3,35 @@ import { Server } from 'http'
 import credentials from '../../credentials'
 import opn from 'opn'
 import { google, GoogleApis } from 'googleapis'
+import lowdb from 'lowdb'
+import FileSync from 'lowdb/adapters/FileSync'
+import Memory from 'lowdb/adapters/Memory'
+import path from 'path'
+import mkdirp from 'mkdirp'
 const OAuth2 = google.auth.OAuth2
 
 export default async function authentication ():Promise<GoogleApis> {
+  const db = initDbSync('./.cache/authCode.json')
   const webServer = await startWebServer()
   const OAuthClient = await createOAuthClient()
-  requestUserConsent(OAuthClient)
-  const authorizationToken = await waitForGoogleCallback(webServer.app)
-  await requestGoogleForAccessTokens(OAuthClient, authorizationToken)
-  setGlobalGoogleAuthentication(OAuthClient)
+  await getOAuthClient(OAuthClient)
   closeServer(webServer.server)
 
   interface webServer {
     app: Express;
     server: Server;
+  }
+
+  function initDbSync<T> (filePath: string): lowdb.LowdbSync<T> {
+    let adapter: lowdb.AdapterSync
+    if (filePath) {
+      const parentDir = path.dirname(filePath)
+      mkdirp.sync(parentDir)
+      adapter = new FileSync<T>(filePath)
+    } else {
+      adapter = new Memory<T>('')
+    }
+    return lowdb(adapter)
   }
 
   async function startWebServer ():Promise<webServer> {
@@ -32,34 +47,13 @@ export default async function authentication ():Promise<GoogleApis> {
     })
   }
 
-  async function createOAuthClient () {
-    const OAuthClient = new OAuth2(
-      credentials.oauth.client_id,
-      credentials.oauth.client_secret,
-      credentials.oauth.redirect_uris[0]
-    )
-
-    return OAuthClient
-  }
-
-  function requestUserConsent (OAuthClient) {
-    const consentUrl = OAuthClient.generateAuthUrl({
-      access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/presentations'
-      ]
-    })
-    opn(consentUrl)
-    console.log('> [slides-robot] Please give your consent')
-  }
-
-  async function waitForGoogleCallback (webServer:Express) {
+  async function waitForGoogleCallback (app:Express) {
     return new Promise((resolve) => {
       console.log('> [slides-robot] Waiting for user consent...')
 
-      webServer.get('/callback', (req:Request, res:Response) => {
+      app.get('/callback', (req:Request, res:Response) => {
         const authCode = req.query.code
-        console.log(`> [slides-robot] Consent given: ${authCode}`)
+        console.log('> [slides-robot] Consent given')
 
         res.send('<h1>Thank you!</h1><p>Now close this tab.</p>')
         resolve(authCode)
@@ -67,22 +61,50 @@ export default async function authentication ():Promise<GoogleApis> {
     })
   }
 
-  async function requestGoogleForAccessTokens (OAuthClient, authorizationToken) {
-    return new Promise((resolve, reject) => {
-      OAuthClient.getToken(authorizationToken, (error, tokens) => {
-        if (error) {
-          return reject(error)
-        }
+  async function createOAuthClient () {
+    const OAuthClient = new OAuth2(
+      credentials.oauth.client_id,
+      credentials.oauth.client_secret,
+      credentials.oauth.redirect_uris[0]
+    )
 
-        console.log('> [slides-robot] Access tokens received!')
-
-        OAuthClient.setCredentials(tokens)
-        resolve()
-      })
+    OAuthClient.on('tokens', async (tokens) => {
+      if (tokens.refresh_token) {
+        console.log('Saving refresh token')
+        await db.set('user', tokens).write()
+      }
     })
+
+    return OAuthClient
   }
 
-  function setGlobalGoogleAuthentication (OAuthClient) {
+  async function getOAuthClient (OAuthClient) {
+    const tokens = db.get('user').value()
+    if (tokens) {
+      console.log('User previously authorized, refreshing')
+      OAuthClient.setCredentials(tokens)
+      const newOAuthClient = await OAuthClient.getAccessToken()
+      google.options({
+        auth: OAuthClient
+      })
+      return newOAuthClient
+    }
+
+    const consentUrl = OAuthClient.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'select_account',
+      scope: ['https://www.googleapis.com/auth/drive.file',
+        'https://www.googleapis.com/auth/presentations'
+      ]
+    })
+    console.log('> [slides-robot] Please give your consent')
+    opn(consentUrl)
+
+    const authCode = await waitForGoogleCallback(webServer.app)
+
+    const tokenResponse = await OAuthClient.getToken(authCode)
+    OAuthClient.setCredentials(tokenResponse.tokens)
+
     google.options({
       auth: OAuthClient
     })
