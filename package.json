@@ -41,12 +41,15 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
+    "@types/lowdb": "^1.0.9",
     "algorithmia": "^0.3.10",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "googleapis": "^52.1.0",
     "ibm-watson": "^5.6.0",
     "image-downloader": "^4.0.1",
+    "lowdb": "^1.0.0",
+    "mkdirp": "^1.0.4",
     "opn": "^6.0.0",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.18"
