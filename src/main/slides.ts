@@ -3,11 +3,12 @@ import auth from '../services/auth'
 import opn from 'opn'
 import sleep from '../utils/sleep'
 import upperFirstChar from '../utils/upperFirstChar'
+import logger, { bold } from '../log'
 
 export default async function slides (data:Data):Promise<void> {
   const google = await auth()
   const slides = google.slides({ version: 'v1' })
-
+  logger.process.start(2, 3, 'Creating presentation')
   const idResponse = await createPresentation()
   const presentationId = idResponse
   await createPage()
@@ -15,8 +16,16 @@ export default async function slides (data:Data):Promise<void> {
   await insertText()
   //
   await updateShape()
+  logger.process.stop()
   await textStyles()
-  openBrowser()
+  logger.process.start(3, 3, 'Finishing')
+  await openBrowser()
+  logger.process.stop()
+  await sleep(1000)
+  logger.event('success', 'Presentation successfully created')
+  logger.event('success', `Presentation available: https://docs.google.com/presentation/d/${presentationId}`)
+  logger.event('info', `Created by ${bold('vilmacio22')}: https://github.com/vilmacio22`)
+  console.log(bold('Thanks for using!'))
 
   async function presentationDataUpdate () {
     await sleep(1000)
@@ -227,8 +236,8 @@ export default async function slides (data:Data):Promise<void> {
     }
   }
 
-  function openBrowser () {
-    console.log('> [google-robot] Opening presentation...')
+  async function openBrowser () {
+    await sleep(3000)
     opn(`https://docs.google.com/presentation/d/${presentationId}/`)
   }
 }
