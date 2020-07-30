@@ -4,13 +4,16 @@ import algorithmia from 'algorithmia'
 import sbd from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understanding/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
+import logger from '../log'
 
 export default async function text (data:Data):Promise<void> {
+  logger.process.start(1, 3, 'Fetching content')
   const fullContent = await fetchContent(data.input.articleName, data.input.lang)
   data.cleanContent = cleanContent(fullContent)
   data.indexContent = indexContent(data.cleanContent)
   breakContent(data.indexContent)
   limitSentences(true, data, 1)
+  logger.process.stop()
   await setKeywords(data)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {

@@ -9,6 +9,7 @@ import Memory from 'lowdb/adapters/Memory'
 import path from 'path'
 import mkdirp from 'mkdirp'
 import jwt from 'jsonwebtoken'
+import logger, { bold } from '../log'
 const OAuth2 = google.auth.OAuth2
 
 export default async function authentication ():Promise<GoogleApis> {
@@ -50,12 +51,10 @@ export default async function authentication ():Promise<GoogleApis> {
 
   async function waitForGoogleCallback (app:Express) {
     return new Promise((resolve) => {
-      console.log('> [slides-robot] Waiting for user consent...')
+      logger.event('info', 'Waiting for user consent')
 
       app.get('/callback', (req:Request, res:Response) => {
         const authCode = req.query.code
-        console.log('> [slides-robot] Consent given')
-
         res.send('<h1>Thank you!</h1><p>Now close this tab.</p>')
         resolve(authCode)
       })
@@ -71,8 +70,8 @@ export default async function authentication ():Promise<GoogleApis> {
 
     OAuthClient.on('tokens', async (tokens) => {
       if (tokens.refresh_token) {
-        const decoded:any = jwt.decode(tokens.id_token)
-        console.log(`> Logged as %s${decoded.email}`, 'color:green')
+        const payload:any = jwt.decode(tokens.id_token)
+        logger.event('info', `Logged in as ${bold(payload.email)}`)
         await db.set('user', tokens).write()
       }
     })
@@ -83,8 +82,8 @@ export default async function authentication ():Promise<GoogleApis> {
   async function getOAuthClient (OAuthClient) {
     const tokens = db.get('user').value()
     if (tokens) {
-      const decoded:any = jwt.decode(tokens.id_token)
-      console.log(`> Logged as %s${decoded.email}`, 'color:green')
+      const payload:any = jwt.decode(tokens.id_token)
+      logger.event('info', `Logged as ${bold(payload.email)}`)
       OAuthClient.setCredentials(tokens)
       const newOAuthClient = await OAuthClient.getAccessToken()
       google.options({
@@ -102,7 +101,6 @@ export default async function authentication ():Promise<GoogleApis> {
         'email'
       ]
     })
-    console.log('> [slides-robot] Please give your consent')
     opn(consentUrl)
 
     const authCode = await waitForGoogleCallback(webServer.app)

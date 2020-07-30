@@ -2,7 +2,7 @@ import chalk from 'chalk'
 
 export function event (type:string, message:string):void | Error {
   switch (type) {
-    case 'sucess':
+    case 'success':
       console.log(`> ${chalk.rgb(60, 255, 60)('success')} ${message}`)
       break
     case 'error':
