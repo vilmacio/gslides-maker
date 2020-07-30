@@ -44,6 +44,7 @@
     "@types/jsonwebtoken": "^8.5.0",
     "@types/lowdb": "^1.0.9",
     "algorithmia": "^0.3.10",
+    "chalk": "^4.1.0",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "googleapis": "^52.1.0",

@@ -6,11 +6,9 @@ import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understa
 import { IamAuthenticator } from 'ibm-watson/auth'
 
 export default async function text (data:Data):Promise<void> {
-  console.log('> [text-robot]')
   const fullContent = await fetchContent(data.input.articleName, data.input.lang)
   data.cleanContent = cleanContent(fullContent)
   data.indexContent = indexContent(data.cleanContent)
-  console.log(data.indexContent)
   breakContent(data.indexContent)
   limitSentences(true, data, 1)
   await setKeywords(data)
@@ -106,7 +104,6 @@ export default async function text (data:Data):Promise<void> {
   }
   async function setKeywords (data:Data):Promise<void> {
     for (const sentence of data.sentences) {
-      console.log(`> [text-robot] Sentence: "${sentence.text}"`)
       sentence.keywords = await fetchWatson(sentence.text)
     }
   }

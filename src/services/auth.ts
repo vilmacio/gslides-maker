@@ -72,7 +72,7 @@ export default async function authentication ():Promise<GoogleApis> {
     OAuthClient.on('tokens', async (tokens) => {
       if (tokens.refresh_token) {
         const decoded:any = jwt.decode(tokens.id_token)
-        console.log(`> Logged as ${decoded.email}`)
+        console.log(`> Logged as %s${decoded.email}`, 'color:green')
         await db.set('user', tokens).write()
       }
     })
@@ -84,7 +84,7 @@ export default async function authentication ():Promise<GoogleApis> {
     const tokens = db.get('user').value()
     if (tokens) {
       const decoded:any = jwt.decode(tokens.id_token)
-      console.log(`> Logged as ${decoded.email}`)
+      console.log(`> Logged as %s${decoded.email}`, 'color:green')
       OAuthClient.setCredentials(tokens)
       const newOAuthClient = await OAuthClient.getAccessToken()
       google.options({
