@@ -8,6 +8,7 @@ import FileSync from 'lowdb/adapters/FileSync'
 import Memory from 'lowdb/adapters/Memory'
 import path from 'path'
 import mkdirp from 'mkdirp'
+import jwt from 'jsonwebtoken'
 const OAuth2 = google.auth.OAuth2
 
 export default async function authentication ():Promise<GoogleApis> {
@@ -70,7 +71,8 @@ export default async function authentication ():Promise<GoogleApis> {
 
     OAuthClient.on('tokens', async (tokens) => {
       if (tokens.refresh_token) {
-        console.log('Saving refresh token')
+        const decoded:any = jwt.decode(tokens.id_token)
+        console.log(`> Logged as ${decoded.email}`)
         await db.set('user', tokens).write()
       }
     })
@@ -81,7 +83,8 @@ export default async function authentication ():Promise<GoogleApis> {
   async function getOAuthClient (OAuthClient) {
     const tokens = db.get('user').value()
     if (tokens) {
-      console.log('User previously authorized, refreshing')
+      const decoded:any = jwt.decode(tokens.id_token)
+      console.log(`> Logged as ${decoded.email}`)
       OAuthClient.setCredentials(tokens)
       const newOAuthClient = await OAuthClient.getAccessToken()
       google.options({
@@ -94,7 +97,9 @@ export default async function authentication ():Promise<GoogleApis> {
       access_type: 'offline',
       prompt: 'select_account',
       scope: ['https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/presentations'
+        'https://www.googleapis.com/auth/presentations',
+        'openid',
+        'email'
       ]
     })
     console.log('> [slides-robot] Please give your consent')
