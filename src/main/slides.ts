@@ -16,8 +16,9 @@ export default async function slides (data:Data):Promise<void> {
   await insertText()
   //
   await updateShape()
-  logger.process.stop()
   await textStyles()
+  logger.process.stop()
+  await sleep(1000)
   logger.process.start(3, 3, 'Finishing')
   await openBrowser()
   logger.process.stop()
@@ -28,7 +29,7 @@ export default async function slides (data:Data):Promise<void> {
   console.log(bold('Thanks for using!'))
 
   async function presentationDataUpdate () {
-    await sleep(1000)
+    await sleep(2000)
     const presentationData = await slides.presentations.get({ presentationId: presentationId })
     return presentationData
   }
@@ -72,7 +73,48 @@ export default async function slides (data:Data):Promise<void> {
     }
 
     async function update () {
-      slides.presentations.batchUpdate({
+      try {
+        slides.presentations.batchUpdate({
+          presentationId: presentationId,
+          requestBody: {
+            requests: structureReq
+          }
+        })
+      } catch (e) {
+        if (e.type) {
+          console.log()
+        }
+      }
+    }
+  }
+
+  async function updateShape () {
+    const presentationData = await presentationDataUpdate()
+    const structureReq = []
+    await reqShapes()
+    await update()
+
+    async function reqShapes () {
+      for (const sentence of data.sentences) {
+        structureReq.push(
+          {
+            updatePageElementTransform: {
+              objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
+              applyMode: 'ABSOLUTE',
+              transform: {
+                scaleX: 2.2024,
+                scaleY: 1.7145,
+                translateX: 1262375,
+                unit: 'EMU'
+              }
+            }
+          }
+        )
+      }
+    }
+
+    async function update () {
+      await slides.presentations.batchUpdate({
         presentationId: presentationId,
         requestBody: {
           requests: structureReq
@@ -81,36 +123,13 @@ export default async function slides (data:Data):Promise<void> {
     }
   }
 
-  async function updateShape () {
-    const presentationData = await presentationDataUpdate()
-    for (const sentence of data.sentences) {
-      slides.presentations.batchUpdate({
-        presentationId: presentationId,
-        requestBody: {
-          requests: [
-            {
-              updatePageElementTransform: {
-                objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
-                applyMode: 'ABSOLUTE',
-                transform: {
-                  scaleX: 2.2024,
-                  scaleY: 1.7145,
-                  translateX: 1262375,
-                  unit: 'EMU'
-                }
-              }
-            }
-          ]
-        }
-      })
-    }
-  }
-
   async function insertText () {
     const presentationData = await presentationDataUpdate()
     const pages = presentationData.data.slides
+    const structureReq = []
     await firstAndLastPage()
-    await contentPage()
+    await contentPageRequests()
+    await update()
 
     async function firstAndLastPage () {
       const subtitle = upperFirstChar(data.sentences[0].keywords[1])
@@ -147,90 +166,84 @@ export default async function slides (data:Data):Promise<void> {
       })
     }
 
-    async function contentPage () {
+    async function contentPageRequests () {
       for (const sentence of data.sentences) {
-        await slides.presentations.batchUpdate({
-          presentationId: presentationId,
-          requestBody: {
-            requests: [
-              {
-                insertText: {
-                  objectId: pages[sentence.id].pageElements[0].objectId,
-                  text: sentence.text
-                }
-              }
-            ]
+        structureReq.push(
+          {
+            insertText: {
+              objectId: pages[sentence.id].pageElements[0].objectId,
+              text: sentence.text
+            }
           }
-        })
+        )
       }
+    }
+
+    async function update () {
+      await slides.presentations.batchUpdate({
+        presentationId: presentationId,
+        requestBody: {
+          requests: structureReq
+        }
+      })
     }
   }
 
   async function textStyles ():Promise<void> {
     const presentationData = await presentationDataUpdate()
-    for (const sentence of data.sentences) {
-      await slides.presentations.batchUpdate({
-        presentationId: presentationId,
-        requestBody: {
-          requests: [
-            {
-              updateShapeProperties: {
-                objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
-                fields: '*',
-                shapeProperties: {
-                  contentAlignment: 'MIDDLE'
-                }
+    const structureReq = []
+    await requests()
+    await update()
+
+    async function requests () {
+      for (const sentence of data.sentences) {
+        structureReq.push({
+          updateShapeProperties: {
+            objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
+            fields: '*',
+            shapeProperties: {
+              contentAlignment: 'MIDDLE'
+            }
+          }
+        },
+        {
+          updateParagraphStyle: {
+            objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
+            fields: '*',
+            style: {
+              lineSpacing: 115,
+              alignment: 'CENTER',
+              indentStart: {
+                unit: 'PT'
+              },
+              indentFirstLine: {
+                unit: 'PT'
+              },
+              direction: 'LEFT_TO_RIGHT'
+            }
+          }
+        },
+        {
+          updateTextStyle: {
+            objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
+            fields: 'fontSize',
+            style: {
+              fontSize: {
+                magnitude: 21,
+                unit: 'PT'
               }
             }
-          ]
+          }
         }
-      })
-    }
-    for (const sentence of data.sentences) {
-      await slides.presentations.batchUpdate({
-        presentationId: presentationId,
-        requestBody: {
-          requests: [
-            {
-              updateParagraphStyle: {
-                objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
-                fields: '*',
-                style: {
-                  lineSpacing: 115,
-                  alignment: 'CENTER',
-                  indentStart: {
-                    unit: 'PT'
-                  },
-                  indentFirstLine: {
-                    unit: 'PT'
-                  },
-                  direction: 'LEFT_TO_RIGHT'
-                }
-              }
-            }
-          ]
-        }
-      })
+        )
+      }
     }
 
-    for (const sentence of data.sentences) {
+    async function update () {
       await slides.presentations.batchUpdate({
         presentationId: presentationId,
         requestBody: {
-          requests: [
-            {
-              updateTextStyle: {
-                objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
-                fields: 'fontSize',
-                style: {
-                  fontSize: {
-                    magnitude: 21,
-                    unit: 'PT'
-                  }
-                }
-              }
-            }
-          ]
+          requests: structureReq
         }
       })
     }

@@ -5,6 +5,7 @@ import sbd from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understanding/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
 import logger from '../log'
+import sleep from '../utils/sleep'
 
 export default async function text (data:Data):Promise<void> {
   logger.process.start(1, 3, 'Fetching content')
@@ -12,9 +13,10 @@ export default async function text (data:Data):Promise<void> {
   data.cleanContent = cleanContent(fullContent)
   data.indexContent = indexContent(data.cleanContent)
   breakContent(data.indexContent)
-  limitSentences(true, data, 1)
-  logger.process.stop()
+  limitSentences(false, data, 1)
   await setKeywords(data)
+  logger.process.stop()
+  await sleep(1200)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {
     try {
@@ -108,6 +110,7 @@ export default async function text (data:Data):Promise<void> {
   async function setKeywords (data:Data):Promise<void> {
     for (const sentence of data.sentences) {
       sentence.keywords = await fetchWatson(sentence.text)
+      break
     }
   }
 }

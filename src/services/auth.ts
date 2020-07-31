@@ -83,7 +83,7 @@ export default async function authentication ():Promise<GoogleApis> {
     const tokens = db.get('user').value()
     if (tokens) {
       const payload:any = jwt.decode(tokens.id_token)
-      logger.event('info', `Logged as ${bold(payload.email)}`)
+      logger.event('info', `Logged in as ${bold(payload.email)}`)
       OAuthClient.setCredentials(tokens)
       const newOAuthClient = await OAuthClient.getAccessToken()
       google.options({
