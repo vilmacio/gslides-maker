@@ -8,3 +8,12 @@
 ---
 
 ## Installation and usage
+Install gslides-maker globally using `-g` argument:
+```
+npm install -g gslides-maker
+```
+After that, run from your command line the following:
+```
+gslides-maker
+```
+## Adaptive slides
