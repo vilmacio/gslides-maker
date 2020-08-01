@@ -1,6 +1,6 @@
 import express, { Request, Response, Express } from 'express'
 import { Server } from 'http'
-import credentials from '../../credentials'
+import credentials from '../config/credentials'
 import opn from 'opn'
 import { google, GoogleApis } from 'googleapis'
 import lowdb from 'lowdb'
