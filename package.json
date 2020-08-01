@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "sucrase-node src/index.ts",
-    "build": "tsc"
+    "build": "sucrase ./src -d ./dist/lib --transforms typescript,imports"
   },
   "repository": {
     "type": "git",

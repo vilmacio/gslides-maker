@@ -1,5 +1,5 @@
 import algorithmia from 'algorithmia'
-import credentials from '../../credentials'
+import credentials from '../config/credentials'
 
 async function getArticlesArray (search:string):Promise<Array<string>> {
   const wikipedia = algorithmia(credentials.algorithmia).algo('web/WikipediaParser/0.1.2')

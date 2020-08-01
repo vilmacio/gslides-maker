@@ -1,5 +1,5 @@
 import { Data } from './data'
-import credentials from '../../credentials'
+import credentials from '../config/credentials'
 import algorithmia from 'algorithmia'
 import sbd from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understanding/v1'
