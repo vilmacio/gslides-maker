@@ -16,7 +16,7 @@ export default async function text (data:Data):Promise<void> {
   limitSentences(false, data, 1)
   await setKeywords(data)
   logger.process.stop()
-  await sleep(1200)
+  await sleep(1500)
 
   async function fetchContent (articleName:string, lang:string):Promise<string> {
     try {

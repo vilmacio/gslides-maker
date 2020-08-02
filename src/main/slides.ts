@@ -4,6 +4,7 @@ import opn from 'opn'
 import sleep from '../utils/sleep'
 import upperFirstChar from '../utils/upperFirstChar'
 import logger, { bold } from '../log'
+import getSubtitle from '../utils/getSubtitle'
 
 export default async function slides (data:Data):Promise<void> {
   const google = await auth()
@@ -18,11 +19,11 @@ export default async function slides (data:Data):Promise<void> {
   await updateShape()
   await textStyles()
   logger.process.stop()
-  await sleep(1000)
+  await sleep(1200)
   logger.process.start(3, 3, 'Finishing')
   await openBrowser()
   logger.process.stop()
-  await sleep(1000)
+  await sleep(1200)
   logger.event('success', 'Presentation successfully created')
   logger.event('success', `Presentation available: https://docs.google.com/presentation/d/${presentationId}`)
   logger.event('info', `Created by ${bold('vilmacio22')}: https://github.com/vilmacio22`)
@@ -132,7 +133,7 @@ export default async function slides (data:Data):Promise<void> {
     await update()
 
     async function firstAndLastPage () {
-      const subtitle = upperFirstChar(data.sentences[0].keywords[1])
+      const subtitle = upperFirstChar(getSubtitle(data.sentences[0].keywords, data.input.articleName))
       await slides.presentations.batchUpdate({
         presentationId: presentationId,
         requestBody: {
