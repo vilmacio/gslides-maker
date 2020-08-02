@@ -1,12 +1,13 @@
 import chalk from 'chalk'
 import { event } from './event'
-import { start, stop } from './process'
+import { start, stop, debug } from './process'
 
 export default {
   event,
   process: {
     start,
-    stop
+    stop,
+    debug
   },
   bold
 }

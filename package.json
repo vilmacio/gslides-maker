@@ -1,16 +1,16 @@
 {
-  "name": "googleslides-maker",
-  "version": "1.0.0",
+  "name": "gslides-maker",
+  "version": "0.5.0",
   "description": "Generate Google Slides from Wikipedia",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "sucrase-node src/index.ts",
     "build": "sucrase ./src -d ./dist/lib --transforms typescript,imports"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vilmacio22/googleslides-maker.git"
+    "url": "git+https://github.com/vilmacio22/gslides-maker.git"
   },
   "keywords": [
     "google-slides",
@@ -20,12 +20,13 @@
   "author": "Vilmacio M. Silva <vilmaciomoura@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vilmacio22/googleslides-maker/issues"
+    "url": "https://github.com/vilmacio22/gslides-maker/issues"
   },
-  "homepage": "https://github.com/vilmacio22/googleslides-maker#readme",
+  "homepage": "https://github.com/vilmacio22/gslides-maker#readme",
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.1",
     "@types/express": "^4.17.6",
+    "@types/jest": "^26.0.8",
     "@types/opn": "^5.5.0",
     "@types/readline-sync": "^1.4.3",
     "@types/sbd": "^1.0.1",
@@ -37,7 +38,9 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.2.2",
     "sucrase": "^3.15.0",
+    "ts-jest": "^26.1.4",
     "typescript": "^3.9.5"
   },
   "dependencies": {
