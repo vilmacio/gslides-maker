@@ -13,7 +13,7 @@ import logger, { bold } from '../log'
 const OAuth2 = google.auth.OAuth2
 
 export default async function authentication ():Promise<GoogleApis> {
-  const db = initDbSync('./.cache/authCode.json')
+  const db = initDbSync(path.join(__dirname, '../../.cache/authCode.json'))
   const webServer = await startWebServer()
   const OAuthClient = await createOAuthClient()
   await getOAuthClient(OAuthClient)

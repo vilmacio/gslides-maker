@@ -4,7 +4,7 @@ import { Data } from './data'
 import { bold } from '../log'
 
 export default async function userInput (data:Data):Promise<Data> {
-  console.log(bold('googleslides-maker v0.5 [beta]'))
+  console.log(bold('gslides-maker v0.5 [beta]'))
   data.input.search = getSearch()
   data.input.articleName = await getArticle(getArticlesArray(data.input.search))
   data.input.lang = await getLang()

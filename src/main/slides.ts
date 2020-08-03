@@ -2,7 +2,6 @@ import { Data } from './data'
 import auth from '../services/auth'
 import opn from 'opn'
 import sleep from '../utils/sleep'
-import upperFirstChar from '../utils/upperFirstChar'
 import logger, { bold } from '../log'
 import getSubtitle from '../utils/getSubtitle'
 
@@ -133,7 +132,7 @@ export default async function slides (data:Data):Promise<void> {
     await update()
 
     async function firstAndLastPage () {
-      const subtitle = upperFirstChar(getSubtitle(data.sentences[0].keywords, data.input.articleName))
+      const subtitle = getSubtitle(data.sentences[0].keywords, data.input.articleName)
       await slides.presentations.batchUpdate({
         presentationId: presentationId,
         requestBody: {
