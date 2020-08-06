@@ -2,13 +2,13 @@ import { Data } from './data'
 import auth from '../services/auth'
 import opn from 'opn'
 import sleep from '../utils/sleep'
-import logger, { bold } from '../log'
+import logger, { spinner, bold } from '../log'
 import getSubtitle from '../utils/getSubtitle'
 
 export default async function slides (data:Data):Promise<void> {
   const google = await auth()
   const slides = google.slides({ version: 'v1' })
-  logger.process.start(2, 3, 'Creating presentation')
+  spinner.start('Creating presentation ')
   const idResponse = await createPresentation()
   const presentationId = idResponse
   await createPage()
@@ -17,16 +17,15 @@ export default async function slides (data:Data):Promise<void> {
   //
   await updateShape()
   await textStyles()
-  logger.process.stop()
-  await sleep(1200)
-  logger.process.start(3, 3, 'Finishing')
+  spinner.succeed()
+  spinner.start('Finishing ')
   await openBrowser()
-  logger.process.stop()
-  await sleep(1200)
+  spinner.succeed()
   logger.event('success', 'Presentation successfully created')
   logger.event('success', `Presentation available: https://docs.google.com/presentation/d/${presentationId}`)
   logger.event('info', `Created by ${bold('vilmacio22')}: https://github.com/vilmacio22`)
   console.log(bold('Thanks for using!'))
+  console.log(data.sentences[0].keywords)
 
   async function presentationDataUpdate () {
     await sleep(2000)
@@ -250,7 +249,7 @@ export default async function slides (data:Data):Promise<void> {
   }
 
   async function openBrowser () {
-    await sleep(3000)
+    await sleep(1000)
     opn(`https://docs.google.com/presentation/d/${presentationId}/`)
   }
 }
