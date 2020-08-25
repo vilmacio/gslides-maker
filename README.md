@@ -46,4 +46,4 @@ This project is under the MIT license. See the [LICENSE](https://github.com/vilm
 
 ---
 
-Created by [vilmacio22](https://github.com/vilmacio22)
+Created by [vilmacio](https://github.com/vilmacio)
