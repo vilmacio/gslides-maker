@@ -29,7 +29,7 @@ The generated presentation is a `BLANK` theme. After the presentation is created
 ### Getting Started
 ```bash
 # Clone this repository
-$ git clone https://github.com/vilmacio22/gslides-maker.git
+$ git clone https://github.com/vilmacio/gslides-maker.git
 
 # Go into the repository
 $ cd gslides-maker
@@ -42,7 +42,7 @@ $ npm install
 This [node](https://nodejs.org/en/docs/) project was developed with [Typescript](https://www.typescriptlang.org/docs/home.html) using factory method pattern. [Sucrase](https://github.com/alangpierce/sucrase) is used for compiling and [Jest](https://jestjs.io/docs/en/getting-started) is used for testing. See `/package.json` for more information.
 
 ## License
-This project is under the MIT license. See the [LICENSE](https://github.com/vilmacio22/gslides-maker/blob/master/LICENSE) for more information.
+This project is under the MIT license. See the [LICENSE](https://github.com/vilmacio/gslides-maker/blob/master/LICENSE) for more information.
 
 ---
 
