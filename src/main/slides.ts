@@ -25,7 +25,6 @@ export default async function slides (data:Data):Promise<void> {
   logger.event('success', `Presentation available: https://docs.google.com/presentation/d/${presentationId}`)
   logger.event('info', `Created by ${bold('vilmacio22')}: https://github.com/vilmacio22`)
   console.log(bold('Thanks for using!'))
-  console.log(data.sentences[0].keywords)
 
   async function presentationDataUpdate () {
     await sleep(2000)
