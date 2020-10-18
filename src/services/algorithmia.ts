@@ -1,8 +1,8 @@
 import algorithmia from 'algorithmia'
-import credentials from '../config/credentials'
+import 'dotenv/config'
 
 async function getArticlesArray (search:string):Promise<Array<string>> {
-  const wikipedia = algorithmia(credentials.algorithmia).algo('web/WikipediaParser/0.1.2')
+  const wikipedia = algorithmia(process.env.ALGORITHMIA_API_KEY).algo('web/WikipediaParser/0.1.2')
   const wikipediaResponse = await wikipedia.pipe({ search: search })
   const wikipediaAllArticles = wikipediaResponse.get()
   const cutArticles = wikipediaAllArticles.slice(0, 7)

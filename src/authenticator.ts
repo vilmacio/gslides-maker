@@ -1,30 +1,51 @@
 import express, { Request, Response, Express } from 'express'
 import { Server } from 'http'
-import credentials from '../config/credentials'
+import 'dotenv/config'
 import opn from 'opn'
 import { google, GoogleApis } from 'googleapis'
-import lowdb from 'lowdb'
+import { OAuth2Client } from 'google-auth-library'
+import lowdb, { LowdbSync } from 'lowdb'
 import FileSync from 'lowdb/adapters/FileSync'
 import Memory from 'lowdb/adapters/Memory'
 import path from 'path'
 import mkdirp from 'mkdirp'
 import jwt from 'jsonwebtoken'
-import logger, { bold } from '../log'
+import logger, { bold } from './log'
 const OAuth2 = google.auth.OAuth2
 
-export default async function authentication ():Promise<GoogleApis> {
-  const db = initDbSync(path.join(__dirname, '../../.cache/authCode.json'))
-  const webServer = await startWebServer()
-  const OAuthClient = await createOAuthClient()
-  await getOAuthClient(OAuthClient)
-  closeServer(webServer.server)
+export interface webServer {
+  app: Express;
+  server: Server;
+}
 
-  interface webServer {
-    app: Express;
-    server: Server;
+export interface AuthOptions {
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string
+}
+
+export default class Authentication {
+  private authOptions: AuthOptions
+  private db: LowdbSync<unknown>
+
+  public constructor (authOptions: AuthOptions) {
+    this.authOptions = authOptions
   }
 
-  function initDbSync<T> (filePath: string): lowdb.LowdbSync<T> {
+  /**
+   * Start google authentication
+   */
+  public async authenticate ():Promise<GoogleApis> {
+    this.db = this.initDbSync(path.join(__dirname, '../../.cache/authCode.json'))
+    const webServer = await this.startWebServer()
+    const OAuthClient = await this.createOAuthClient(this.db)
+    const authenticatedUser = await this.getOAuthClient(OAuthClient, this.db, webServer)
+    this.closeServer(webServer.server)
+
+    return authenticatedUser
+  }
+
+  public initDbSync<T> (filePath: string): lowdb.LowdbSync<T> {
     let adapter: lowdb.AdapterSync
     if (filePath) {
       const parentDir = path.dirname(filePath)
@@ -36,7 +57,7 @@ export default async function authentication ():Promise<GoogleApis> {
     return lowdb(adapter)
   }
 
-  async function startWebServer ():Promise<webServer> {
+  public async startWebServer ():Promise<webServer> {
     return new Promise((resolve) => {
       const app = express()
 
@@ -49,23 +70,23 @@ export default async function authentication ():Promise<GoogleApis> {
     })
   }
 
-  async function waitForGoogleCallback (app:Express) {
+  public async waitForGoogleCallback (app:Express):Promise<string> {
     return new Promise((resolve) => {
       logger.event('info', 'Waiting for user consent')
 
       app.get('/callback', (req:Request, res:Response) => {
-        const authCode = req.query.code
+        const authCode:any = req.query.code
         res.send('<h1>Thank you!</h1><p>Now close this tab.</p>')
         resolve(authCode)
       })
     })
   }
 
-  async function createOAuthClient () {
+  public async createOAuthClient (db:LowdbSync<unknown>):Promise<OAuth2Client> {
     const OAuthClient = new OAuth2(
-      credentials.oauth.client_id,
-      credentials.oauth.client_secret,
-      credentials.oauth.redirect_uris[0]
+      this.authOptions.clientId || process.env.OAUTH_CLIENT_ID,
+      this.authOptions.clientSecret || process.env.OAUTH_CLIENT_SECRET,
+      this.authOptions.redirectUri || process.env.OAUTH_REDIRECT_URI
     )
 
     OAuthClient.on('tokens', async (tokens) => {
@@ -79,17 +100,17 @@ export default async function authentication ():Promise<GoogleApis> {
     return OAuthClient
   }
 
-  async function getOAuthClient (OAuthClient) {
+  public async getOAuthClient (OAuthClient:OAuth2Client, db:LowdbSync<unknown>, webServer:webServer):Promise<GoogleApis> {
     const tokens = db.get('user').value()
     if (tokens) {
       const payload:any = jwt.decode(tokens.id_token)
       logger.event('info', `Logged in as ${bold(payload.email)}`)
       OAuthClient.setCredentials(tokens)
-      const newOAuthClient = await OAuthClient.getAccessToken()
       google.options({
         auth: OAuthClient
       })
-      return newOAuthClient
+
+      return google
     }
 
     const consentUrl = OAuthClient.generateAuthUrl({
@@ -103,7 +124,7 @@ export default async function authentication ():Promise<GoogleApis> {
     })
     opn(consentUrl)
 
-    const authCode = await waitForGoogleCallback(webServer.app)
+    const authCode = await this.waitForGoogleCallback(webServer.app)
 
     const tokenResponse = await OAuthClient.getToken(authCode)
     OAuthClient.setCredentials(tokenResponse.tokens)
@@ -111,11 +132,11 @@ export default async function authentication ():Promise<GoogleApis> {
     google.options({
       auth: OAuthClient
     })
+
+    return google
   }
 
-  function closeServer (server:Server) {
+  public closeServer (server:Server):void {
     server.close()
   }
-
-  return google
 }
