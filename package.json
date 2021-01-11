@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "algorithmia": "^0.3.10",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "chalk": "^4.1.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
