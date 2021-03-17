@@ -7,15 +7,12 @@
 
 ---
 
-## Installation and usage
+## Note
 Install gslides-maker globally using `-g` argument:
 ```
 npm install -g gslides-maker
 ```
-After that, run from your command line the following:
-```
-gslides-maker
-```
+
 ## Adaptive Slides
 <p><img src="examples/beach-day.png" width="49%"> <img src="examples/spearmint.png" width="49%"><p/>
 
@@ -24,22 +21,6 @@ The generated presentation is a `BLANK` theme. After the presentation is created
 
 <p><img src="examples/focus.png" width="49%"> <img src="examples/pop.png" width="49%"></p>
 <p><img src="examples/blue&gold.png" width="49%"> <img src="examples/beach-day2.png" width="49%"></p>
-
-## Development
-### Getting Started
-```bash
-# Clone this repository
-$ git clone https://github.com/vilmacio/gslides-maker.git
-
-# Go into the repository
-$ cd gslides-maker
-
-# Install dependencies
-$ npm install
-```
-
-### Technologies
-This [node](https://nodejs.org/en/docs/) project was developed with [Typescript](https://www.typescriptlang.org/docs/home.html) using factory method pattern. [Sucrase](https://github.com/alangpierce/sucrase) is used for compiling and [Jest](https://jestjs.io/docs/en/getting-started) is used for testing. See `/package.json` for more information.
 
 ## License
 This project is under the MIT license. See the [LICENSE](https://github.com/vilmacio/gslides-maker/blob/master/LICENSE) for more information.
