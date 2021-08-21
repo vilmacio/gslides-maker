@@ -1,6 +1,6 @@
 import { Data } from '../data'
 import 'dotenv/config'
-import algorithmia from 'algorithmia'
+import Algorithmia from 'algorithmia'
 import sbd from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understanding/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
@@ -18,18 +18,14 @@ export default class Text {
    * @returns {Promise.<String>} Wikipedia content
    */
   public async fetchContent (articleName:string, lang:string):Promise<string> {
-    try {
-      const input = {
-        articleName,
-        lang
-      }
-      const wikipedia = algorithmia(process.env.ALGORITHMIA_API_KEY).algo('web/WikipediaParser/0.1.2')
-      const wikipediaResponse = await wikipedia.pipe(input)
-      const wikipediaContent = wikipediaResponse.get()
-      return wikipediaContent.content
-    } catch (e) {
-      throw Error(e)
+    const input = {
+      articleName,
+      lang
     }
+    const wikipedia = Algorithmia.client(process.env.ALGORITHMIA_API_KEY).algo('web/WikipediaParser/0.1.2')
+    const wikipediaResponse = await wikipedia.pipe({ ...input })
+    const wikipediaContent = wikipediaResponse.get()
+    return wikipediaContent.content
   }
 
   public async sanitizeContent (fullContent: string):Promise<void> {
