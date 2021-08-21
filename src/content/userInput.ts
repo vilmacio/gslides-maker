@@ -1,8 +1,8 @@
 import readline from 'readline-sync'
-import getArticlesArray from '../services/algorithmia'
 import { Data } from '../data'
 import { bold } from '../log'
 import chalk from 'chalk'
+import { wikipedia } from '../helpers/wikipedia'
 
 export default class userInput {
   constructor (public data:Data) {
@@ -17,7 +17,9 @@ export default class userInput {
   public async start ():Promise<void> {
     console.log(bold('gslides-maker v0.5 [beta]'))
     this.data.input.search = this.getSearch()
-    this.data.input.articleName = await this.getArticle(getArticlesArray(this.data.input.search))
+    const provider = await wikipedia({ articleName: 'any', lang: 'en' })
+    const arrayOfArticles = await provider.search(this.data.input.search)
+    this.data.input.articleName = await this.getArticle(arrayOfArticles)
     this.data.input.lang = await this.getLang()
   }
 
@@ -37,8 +39,7 @@ export default class userInput {
    * @param {Promise.<Array.<String>>} fetchArticles Article options
    * @returns {Promise.<String>}
    */
-  private async getArticle (fetchArticles: Promise<Array<string>>):Promise<string> {
-    const articles = await fetchArticles
+  private async getArticle (articles: Array<string>):Promise<string> {
     const selectedIndex = readline.keyInSelect(articles, `${chalk.bold.green('>')} Choose an Wikipedia article: `)
     if (selectedIndex === -1) {
       process.exit(0)

@@ -104,6 +104,7 @@ src/main/downgrade.ts
 
 # TernJS port file
 .tern-port
+/index.ts
 
 # Credentials
 src/config

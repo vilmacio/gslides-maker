@@ -194,7 +194,7 @@ export default async function slides (data:Data, authenticatedClient:GoogleApis)
         structureReq.push({
           updateShapeProperties: {
             objectId: presentationData.data.slides[sentence.id].pageElements[0].objectId,
-            fields: '*',
+            fields: 'contentAlignment',
             shapeProperties: {
               contentAlignment: 'MIDDLE'
             }

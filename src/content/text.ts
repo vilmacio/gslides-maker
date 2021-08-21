@@ -1,9 +1,9 @@
 import { Data } from '../data'
 import 'dotenv/config'
-import Algorithmia from 'algorithmia'
 import sbd from 'sbd'
 import NaturalLanguageUnderstandingV1 from 'ibm-watson/natural-language-understanding/v1'
 import { IamAuthenticator } from 'ibm-watson/auth'
+import { wikipedia } from '../helpers/wikipedia'
 
 export default class Text {
   constructor (public data:Data) {
@@ -11,7 +11,7 @@ export default class Text {
   }
 
   /**
-   * Fetches Wikipedia content from Algorithmia WikipediaParser.
+   * Fetch Wikipedia content.
    *
    * @param {String} articleName Selected article name
    * @param {String} lang Selected article language
@@ -22,16 +22,14 @@ export default class Text {
       articleName,
       lang
     }
-    const wikipedia = Algorithmia.client(process.env.ALGORITHMIA_API_KEY).algo('web/WikipediaParser/0.1.2')
-    const wikipediaResponse = await wikipedia.pipe({ ...input })
-    const wikipediaContent = wikipediaResponse.get()
-    return wikipediaContent.content
+    const page = await wikipedia(input)
+    const content = page.summary()
+    return content
   }
 
   public async sanitizeContent (fullContent: string):Promise<void> {
     this.data.cleanContent = this.cleanContent(fullContent)
-    this.data.indexContent = this.indexContent(this.data.cleanContent)
-    Text.breakContent(this.data, this.data.indexContent)
+    this.breakContent(this.data, this.data.cleanContent)
     this.limitSentences(false, this.data, 1)
     await this.setKeywords(this.data)
   }
@@ -68,25 +66,12 @@ export default class Text {
   }
 
   /**
-   * Cuts only the indexed Wikipedia content
-   *
-   * @param {String} text Clean content
-   * @returns {String} Indexed Wikipedia content
-   */
-  protected indexContent (text:string):string {
-    const endPosition = text.search('=')
-    const indexContent = text.substring(0, endPosition)
-    return indexContent
-  }
-
-  /**
    * Breaks content into sentences.
-   * @static
    * @param {Data} data main data
    * @param {String} text Indexed content
    * @returns {Array<String>} void
    */
-  public static breakContent (data:Data, text:string):Array<string> {
+  public breakContent (data:Data, text:string):Array<string> {
     const sentences = sbd.sentences(text)
     let id = 1
     data.sentences.shift()
@@ -122,31 +107,25 @@ export default class Text {
    * @param {String} sentence Phrase where the keywords will be taken
    * @returns {Promise.<Array.<String>>} Array of keywords
    */
-  protected fetchWatson (sentence:string):Promise<Array<string>> {
+  protected async fetchWatson (sentence:string):Promise<string[]> {
     const nlu = new NaturalLanguageUnderstandingV1({
       authenticator: new IamAuthenticator({ apikey: process.env.WATSON_API_KEY }),
       version: '2018-04-05',
-      url: 'https://gateway.watsonplatform.net/natural-language-understanding/api/'
+      serviceUrl: 'https://api.us-south.natural-language-understanding.watson.cloud.ibm.com'
     })
-    return new Promise((resolve, reject) => {
-      nlu.analyze({
-        html: sentence,
-        features: {
-          keywords: {}
-        }
-      }, (error, response) => {
-        if (error) {
-          reject(error)
-          return
-        }
 
-        const keywords = response.result.keywords.map((keyword) => {
-          return keyword.text
-        })
+    const analyzeParams = {
+      text: sentence,
+      features: {
+        keywords: {}
+      }
+    }
 
-        resolve(keywords)
-      })
-    })
+    const { result } = await nlu.analyze(analyzeParams)
+    const keywordsObject = result.keywords
+    const keywordsArray = keywordsObject.map(object => object.text)
+
+    return keywordsArray
   }
 
   protected async setKeywords (data:Data):Promise<void> {
