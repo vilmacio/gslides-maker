@@ -45,6 +45,7 @@
     "nock": "^13.0.4",
     "sucrase": "^3.15.0",
     "ts-jest": "^26.1.4",
+    "ts-node": "^10.2.1",
     "typescript": "^3.9.5"
   },
   "dependencies": {
@@ -65,7 +66,8 @@
     "opn": "^6.0.0",
     "ora": "^4.0.5",
     "readline-sync": "^1.4.10",
-    "sbd": "^1.0.18"
+    "sbd": "^1.0.18",
+    "wikijs": "^6.3.2"
   },
   "engines": {
     "node": "14.17.5"
