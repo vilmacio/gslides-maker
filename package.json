@@ -53,7 +53,7 @@
     "express": "^4.17.1",
     "google-auth-library": "^6.0.6",
     "googleapis": "^52.1.0",
-    "ibm-watson": "^5.6.0",
+    "ibm-watson": "^6.1.1",
     "image-downloader": "^4.0.1",
     "jsonwebtoken": "^8.5.1",
     "lowdb": "^1.0.0",

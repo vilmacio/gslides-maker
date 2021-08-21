@@ -187,7 +187,7 @@ export default async function slides (data:Data, authenticatedClient:GoogleApis)
     const presentationData = await presentationDataUpdate()
     const structureReq = []
     await requests()
-    await update()
+    // await update()
 
     async function requests () {
       for (const sentence of data.sentences) {
@@ -233,13 +233,13 @@ export default async function slides (data:Data, authenticatedClient:GoogleApis)
       }
     }
 
-    async function update () {
-      await slides.presentations.batchUpdate({
-        presentationId: presentationId,
-        requestBody: {
-          requests: structureReq
-        }
-      })
-    }
+    // async function update () {
+    //   await slides.presentations.batchUpdate({
+    //     presentationId: presentationId,
+    //     requestBody: {
+    //       requests: structureReq
+    //     }
+    //   })
+    // }
   }
 }

@@ -4,5 +4,6 @@ export interface WikipediaParams {
 }
 
 export interface WikipediaObject {
-    summary: () => Promise<string>
+    summary?: () => Promise<string>
+    search?: (query: string) => Promise<string[]>
 }
