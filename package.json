@@ -1,8 +1,9 @@
 {
   "name": "gslides-maker",
-  "version": "0.5.4",
+  "version": "0.5.7",
   "description": "Generate Google Slides from Wikipedia",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "bin": "lib/index.js",
   "scripts": {
     "test": "jest --watch --detectOpenHandles",
     "start": "sucrase-node src/index.ts",
