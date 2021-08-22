@@ -8,9 +8,12 @@
 ---
 
 ## Note
-Install gslides-maker globally using `-g` argument:
+Install gslides-maker globally using `-g` argument and then run it:
 ```
-npm install -g gslides-maker
+$ npm install -g gslides-maker
+```
+```
+$ gslides-maker
 ```
 
 ## Adaptive Slides
