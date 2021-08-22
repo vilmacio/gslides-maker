@@ -7,7 +7,7 @@
 
 ---
 
-## Note
+## Usage
 Install gslides-maker globally using `-g` argument and then run it:
 ```
 $ npm install -g gslides-maker
