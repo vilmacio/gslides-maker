@@ -22,6 +22,9 @@
   "bugs": {
     "url": "https://github.com/vilmacio22/gslides-maker/issues"
   },
+  "publishConfig": {
+    "@vilmacio:registry": "https://npm.pkg.github.com"
+  },
   "homepage": "https://github.com/vilmacio22/gslides-maker#readme",
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.1",
@@ -55,7 +58,6 @@
     "google-auth-library": "^6.0.6",
     "googleapis": "^52.1.0",
     "ibm-watson": "^6.1.1",
-    "image-downloader": "^4.0.1",
     "jsonwebtoken": "^8.5.1",
     "lowdb": "^1.0.0",
     "mkdirp": "^1.0.4",
