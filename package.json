@@ -1,6 +1,6 @@
 {
   "name": "gslides-maker",
-  "version": "0.5.0",
+  "version": "0.5.4",
   "description": "Generate Google Slides from Wikipedia",
   "main": "src/index.js",
   "scripts": {
